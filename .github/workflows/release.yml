@@ -1,8 +1,8 @@
 name: Release
 on: { push: { branches: [ main ] } }
 permissions:
-  contents: write
-  packages: write
+  contents: read
+  deployments: write
 jobs:
   container:
     runs-on: ubuntu-latest
@@ -32,6 +32,7 @@ jobs:
       - name: Create GitHub release
         uses: actions/create-release@v1
         with:
+          token: "${{ secrets.GITHUB_TOKEN }}"
           tag_name: ${{ steps.data.outputs.release }}
           release_name: Release ${{ steps.data.outputs.release }}
           draft: false
