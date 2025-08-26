@@ -1,0 +1,48 @@
+[project]
+name = "inreach-proxy"
+version = "0.1.0"
+description = "Proxy layer to support RPC type requests from a Garmin InReach"
+authors = [
+    { name = "Damian Zaremba", email = "damian@damianzaremba.co.uk" }
+]
+license = { text = "MIT" }
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "Django",
+    "requests",
+    "pyaml",
+    "defusedxml",
+]
+
+[tool.poetry.group.test.dependencies]
+tox = "4.24.1"
+tox-current-env = "0.0.14"
+black = "25.1.0"
+ruff = "0.9.7"
+djlint = "1.36.4"
+bandit = "1.8.3"
+requests_mock = "1.12.1"
+
+[tool.ruff]
+exclude = ['*/migrations/*', 've/*', '.tox/*']
+line-length = 120
+
+[tool.djlint]
+profile = 'django'
+use_gitignore = true
+max_attribute_length = 120
+
+[tool.black]
+line-length = 120
+extend-exclude = '''
+(
+  ^/ve
+  |
+  ^.*/migrations/.*
+)
+'''
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
