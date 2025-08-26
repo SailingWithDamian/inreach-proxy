@@ -4,12 +4,18 @@ permissions:
   contents: read
   deployments: write
 jobs:
-  container:
+  setup:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - id: data
-        run: echo "::set-output name=release::v$(git show -s --format=%ct)"
+        run: echo "release=v$(git show -s --format=%ct)" >> $GITHUB_OUTPUT
+
+  container:
+    runs-on: ubuntu-latest
+    needs: [ setup, container ]
+    steps:
+      - uses: actions/checkout@v4
       - name: Build container
         run: |
           docker run \
@@ -17,23 +23,20 @@ jobs:
             -v $PWD:/workspace -w /workspace \
             buildpacksio/pack build \
             --builder heroku/builder:24 \
-            ghcr.io/${GITHUB_REPOSITORY,,}:${{ steps.data.outputs.release }}
+            ghcr.io/${GITHUB_REPOSITORY,,}:${{ needs.setup.data.outputs.release }}
       - name: Publish container
         run: |
           echo '${{ secrets.GITHUB_TOKEN }}' | docker login ghcr.io -u ${{ github.repository_owner }} --password-stdin
-          docker push ghcr.io/${GITHUB_REPOSITORY,,}:${{ steps.data.outputs.release }}
+          docker push ghcr.io/${GITHUB_REPOSITORY,,}:${{ needs.setup.data.outputs.release }}
   tag:
     runs-on: ubuntu-latest
-    needs: [ container ]
+    needs: [ setup, container ]
     steps:
-      - uses: actions/checkout@v4
-      - id: data
-        run: echo "::set-output name=release::v$(git show -s --format=%ct)"
       - name: Create GitHub release
         uses: actions/create-release@v1
         with:
           token: "${{ secrets.GITHUB_TOKEN }}"
-          tag_name: ${{ steps.data.outputs.release }}
-          release_name: Release ${{ steps.data.outputs.release }}
+          tag_name: ${{ needs.setup.data.outputs.release }}
+          release_name: Release ${{ needs.setup.data.outputs.release }}
           draft: false
           prerelease: false
