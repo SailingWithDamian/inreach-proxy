@@ -6,6 +6,8 @@ permissions:
 jobs:
   setup:
     runs-on: ubuntu-latest
+    outputs:
+      release: ${{ steps.data.outputs.release }}
     steps:
       - uses: actions/checkout@v5
       - id: data
