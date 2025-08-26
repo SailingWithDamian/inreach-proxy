@@ -29,7 +29,7 @@ jobs:
       - name: Publish container
         run: |
           echo '${{ secrets.GITHUB_TOKEN }}' | docker login ghcr.io -u ${{ github.repository_owner }} --password-stdin
-          docker push ghcr.io/${GITHUB_REPOSITORY,,}:${{ needs.setup.data.outputs.release }}
+          docker push ghcr.io/${GITHUB_REPOSITORY,,}:${{ needs.setup.outputs.release }}
   tag:
     runs-on: ubuntu-latest
     needs: [ setup, container ]
@@ -38,7 +38,7 @@ jobs:
         uses: actions/create-release@v1
         with:
           token: "${{ secrets.GITHUB_TOKEN }}"
-          tag_name: ${{ needs.setup.data.outputs.release }}
+          tag_name: ${{ needs.setup.outputs.release }}
           release_name: Release ${{ needs.setup.outputs.release }}
           draft: false
           prerelease: false
