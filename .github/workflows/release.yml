@@ -12,9 +12,12 @@ jobs:
         run: echo "::set-output name=release::v$(git show -s --format=%ct)"
       - name: Build container
         run: |
-          docker build \
-            -t ghcr.io/${GITHUB_REPOSITORY,,}:${{ steps.data.outputs.release }} \
-            -f docker/Dockerfile .
+          docker run \
+            -v /var/run/docker.sock:/var/run/docker.sock \
+            -v $PWD:/workspace -w /workspace \
+            buildpacksio/pack build \
+            --builder heroku/builder:24 \
+            ghcr.io/${GITHUB_REPOSITORY,,}:${{ steps.data.outputs.release }}
       - name: Publish container
         run: |
           echo '${{ secrets.GITHUB_TOKEN }}' | docker login ghcr.io -u ${{ github.repository_owner }} --password-stdin
