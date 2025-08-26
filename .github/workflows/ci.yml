@@ -1,0 +1,36 @@
+name: CI
+on: { pull_request: { } }
+concurrency:
+  group: ${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+jobs:
+  tox:
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [ "ruff", "bandit", "black", "test" ]
+    runs-on: ubuntu-latest
+    continue-on-error: true
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.13
+          cache: 'pip'
+
+      - name: Install Poetry
+        run: curl -sSL https://install.python-poetry.org | python -
+
+      - name: Install python dependencies
+        run: poetry install --with main,test
+
+      - name: Run test
+        run: poetry run ./manage.py test
+        if: matrix.target == 'test'
+
+      - name: Run tox target
+        run: poetry run tox --current-env -e ${{ matrix.target }}
+        if: matrix.target != 'test'
