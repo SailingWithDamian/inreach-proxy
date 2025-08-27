@@ -14,8 +14,8 @@ logger = logging.getLogger(__name__)
 
 @dataclasses.dataclass
 class SpotForecastAction(BaseAction):
-    latitude: str
-    longitude: str
+    latitude: Optional[str]
+    longitude: Optional[str]
 
     @staticmethod
     def matches(text: str) -> bool:
@@ -33,14 +33,10 @@ class SpotForecastAction(BaseAction):
     @staticmethod
     def from_text(text: str, settings: Optional[Dict[Any, Any]] = None) -> "SpotForecastAction":
         arguments = text.split(" ")[1].strip().split(",") if " " in text else []
-        if len(arguments) == 0 and settings:
-            if map_share_key := settings.get("map_share_key"):
-                latitude, longitude = Garmin().get_latest_position(map_share_key)
-                arguments = [latitude, longitude]
-
+        # Note: Don't resolve the position using the map share here, otherwise the scheduled request will always
+        # be for the same place, rather than the current place.
         if len(arguments) < 2:
-            logger.error(f"Invalid forecast request: {arguments}")
-            return
+            return SpotForecastAction(latitude=None, longitude=None)
 
         # Normalise
         if "." in arguments[0]:
@@ -64,6 +60,17 @@ class SpotForecastAction(BaseAction):
         return 0
 
     def execute_with_email(self, conversation: GarminConversations):
+        if not self.latitude or not self.longitude:
+            if conversation.inbox.settings:
+                if map_share_key := conversation.inbox.settings.get("map_share_key"):
+                    latitude, longitude = Garmin().get_latest_position(map_share_key)
+                    self.latitude = latitude
+                    self.longitude = longitude
+
+        if not self.latitude or not self.longitude:
+            logger.error(f'Failed to get latitude/longitude for forecast: {conversation.inbox.settings}')
+            return
+
         request = f"send spot:{self.latitude},{self.longitude}\nquit\n"
         out = Outbound(conversation.inbox.smtp_host, conversation.inbox.username, conversation.inbox.password)
         out.send_email("query@saildocs.com", request, reply_address=conversation.address)
