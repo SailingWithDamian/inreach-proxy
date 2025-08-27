@@ -71,9 +71,9 @@ class GarminThread:
             },
         )
         if r.status_code != 200:
-            logger.error(f"Failed to send message: {r.status_code}: {r.text}")
+            logger.error(f"Failed to send message: {r.status_code}: {r.text} for '{text}'")
         else:
-            logger.info(f"Garmin API returned: {r.status_code}: {r.text}")
+            logger.info(f"Garmin API returned: {r.status_code}: {r.text} for '{text}'")
         return r.status_code == 200
 
 
