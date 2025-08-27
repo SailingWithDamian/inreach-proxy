@@ -73,10 +73,9 @@ class SpotForecast(BaseResponse):
         message_prefix = ""
         lat, long = self._get_lat_long_from_request()
         if lat and long:
-            message_prefix = f"{lat} {long} "
+            message_prefix = f"{lat} {long}\n"
 
         messages = []
-        seen_days = set()
         for line in interesting_lines[3:]:
             if line.strip() == "":
                 continue
@@ -84,14 +83,12 @@ class SpotForecast(BaseResponse):
             fields = [field for field in line.split(" ") if len(field.strip()) > 0]
             mapped = {header_fields[x]: fields[x] for x, _ in enumerate(header_fields)}
 
-            seen_days.add(mapped["Date"])
-            if len(seen_days) > 2:
-                break
-
             messages.append(
-                f'{message_prefix}{mapped["Date"]} {mapped["Time"]}:\n{mapped["WIND"]}kts G:{mapped["GUST"]} @ {mapped["DIR"]}\n'
-                f'{mapped["HTSGW"]}m/{mapped["PERPW"]}s @ {mapped["DIRPW"]}\n'
-                f'{mapped["PRESS"]}mb'
+                f"{message_prefix}"
+                f'{mapped["Date"]} {mapped["Time"]}\n'
+                f'Wind: {mapped["WIND"]}kts gust {mapped["GUST"]}kts @ {mapped["DIR"]}\n'
+                f'Sea: {mapped["HTSGW"]}m interval {mapped["PERPW"]}s @ {mapped["DIRPW"]}\n'
+                f'Pressure: {mapped["PRESS"]}mb'
             )
 
-        return messages
+        return messages[0:3]
