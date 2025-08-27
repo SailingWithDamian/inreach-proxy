@@ -68,7 +68,7 @@ class SpotForecastAction(BaseAction):
                     self.longitude = longitude
 
         if not self.latitude or not self.longitude:
-            logger.error(f'Failed to get latitude/longitude for forecast: {conversation.inbox.settings}')
+            logger.error(f"Failed to get latitude/longitude for forecast: {conversation.inbox.settings}")
             return
 
         request = f"send spot:{self.latitude},{self.longitude}\nquit\n"

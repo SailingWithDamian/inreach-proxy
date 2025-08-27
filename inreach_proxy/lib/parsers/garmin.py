@@ -39,9 +39,13 @@ class GarminMessageParser:
         plain_text_body = get_message_plain_text_body(message)
 
         parsed_email.garmin_reply_url = garmin_reply_url
-        parsed_email.actions = [
-            action.from_email(message, self._settings)
-            for action in VALID_ACTIONS.values()
-            if action.matches(plain_text_body)
-        ]
+
+        for valid_action in VALID_ACTIONS.values():
+            if valid_action.matches(plain_text_body):
+                action = valid_action.from_email(message, self._settings)
+                if action is None:
+                    logger.error(f"Failed to construct action: {action}")
+                    continue
+                parsed_email.actions.append(action)
+
         return parsed_email

@@ -24,6 +24,10 @@ class Command(BaseCommand):
         for database_id, valid_action in VALID_ACTIONS.items():
             if valid_action.matches(options["message"]):
                 action = valid_action.from_text(options["message"])
+                if action is None:
+                    logger.error(f"Failed to construct action: {action}")
+                    continue
+
                 print(f"Ensuring scheduled request for: {action}")
                 ScheduledRequest.objects.get_or_create(
                     conversation=conversation, group=options["group"], action=database_id, input=action.get_data()
