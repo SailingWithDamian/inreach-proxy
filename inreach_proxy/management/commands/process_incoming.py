@@ -28,6 +28,9 @@ class Command(BaseCommand):
                         conversation.reply_url = parsed_message.garmin_reply_url
                         conversation.save()
 
+                    if not parsed_message.actions and not parsed_message.responses:
+                        logger.warning(f"[{inbox.name}] Found nothing to do for {parsed_message}")
+
                     for action in parsed_message.actions:
                         logger.info(f"[{inbox.name}] Creating action {action}")
                         create_request_for_action(conversation, action)

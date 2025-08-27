@@ -4,7 +4,7 @@ import zlib
 from email.message import EmailMessage
 from email.utils import parsedate_to_datetime, parseaddr
 
-from inreach_proxy.lib.helpers import get_message_plain_text_body
+from inreach_proxy.lib.helpers import get_message_plain_text_body, get_grib_attachment
 from inreach_proxy.lib.models import ParsedEmail
 from inreach_proxy.lib.processors.responses.grib import Grib
 from inreach_proxy.lib.processors.responses.spot_forecast import SpotForecast
@@ -27,7 +27,12 @@ class SailDocsMessageParser:
         request_code = self._find_request_code(body_text)
 
         if Grib.matches(request_code):
-            attachment = message.get_payload(1).get_payload()
+            logger.info(f"Found request code that looks like a GRIB: {request_code}")
+            attachment = get_grib_attachment(message)
+            if not attachment:
+                logger.error(f"Failed to find attachment on GRIB message: {request_code}")
+                return parsed_email
+
             parsed_email.responses.append(
                 Grib(
                     request_code=request_code,
@@ -36,7 +41,8 @@ class SailDocsMessageParser:
                 )
             )
 
-        if SpotForecast.matches(request_code):
+        elif SpotForecast.matches(request_code):
+            logger.info(f"Found request code that looks like a forecast: {request_code}")
             parsed_email.responses.append(
                 SpotForecast(
                     request_code=request_code,
@@ -44,5 +50,8 @@ class SailDocsMessageParser:
                     text=body_text,
                 )
             )
+
+        else:
+            logger.info(f"Did not find matching request code: {request_code}")
 
         return parsed_email

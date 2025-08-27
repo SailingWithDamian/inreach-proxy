@@ -21,7 +21,7 @@ class SpotForecast(BaseResponse):
     @staticmethod
     def matches(text: str) -> bool:
         for line in text.splitlines():
-            if line.startswith("request code: spot:"):
+            if line.startswith("spot:"):
                 return True
         return False
 

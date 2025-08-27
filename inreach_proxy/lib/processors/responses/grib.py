@@ -18,7 +18,12 @@ class Grib(BaseResponse):
     @staticmethod
     def matches(text: str) -> bool:
         for line in text.splitlines():
-            if line.startswith("Grib extracted from"):
+            if any(
+                {
+                    line.startswith(f"{model}:")
+                    for model in {"GFS", "GFS-wave", "HRRR", "ECMWF", "ICON", "NAVGEM", "COAMPS", "RTOFS"}
+                }
+            ):
                 return True
         return False
 
