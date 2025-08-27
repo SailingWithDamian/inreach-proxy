@@ -86,42 +86,19 @@ info@saildocs.com, this will return the how-to document (about 5K).""",
         )
         messages = sf.get_messages()
 
-        self.assertEqual(len(messages), 3)
-        self.assertEqual(
-            messages[0],
-            """38.39N 27.13W 08-26 12:00:
-6.5kts G:7.0 @ 345
-1.4m/12.2s @ 316
-1027.1mb
-
-38.39N 27.13W 08-26 18:00:
-7.2kts G:9.0 @ 335
-1.4m/11.9s @ 321
-1026.2mb""",
-        )
-
+        self.assertEqual(len(messages), 6)
+        self.assertEqual(messages[0], "38.39N 27.13W 08-26 12:00:\n6.5kts G:7.0 @ 345\n1.4m/12.2s @ 316\n1027.1mb")
         self.assertEqual(
             messages[1],
-            """38.39N 27.13W 08-27 00:00:
-7.7kts G:8.6 @ 349
-1.3m/11.7s @ 319
-1027.0mb
-
-38.39N 27.13W 08-27 06:00:
-8.0kts G:10.1 @ 340
-1.1m/11.3s @ 327
-1025.8mb""",
+            "38.39N 27.13W 08-26 18:00:\n7.2kts G:9.0 @ 335\n1.4m/11.9s @ 321\n1026.2mb",
         )
-
+        self.assertEqual(messages[2], "38.39N 27.13W 08-27 00:00:\n7.7kts G:8.6 @ 349\n1.3m/11.7s @ 319\n1027.0mb")
         self.assertEqual(
-            messages[2],
-            """38.39N 27.13W 08-27 12:00:
-8.2kts G:10.1 @ 337
-1.1m/11.0s @ 332
-1027.2mb
-
-38.39N 27.13W 08-27 18:00:
-11.5kts G:12.0 @ 342
-1.2m/11.7s @ 323
-1026.7mb""",
+            messages[3],
+            "38.39N 27.13W 08-27 06:00:\n8.0kts G:10.1 @ 340\n1.1m/11.3s @ 327\n1025.8mb",
+        )
+        self.assertEqual(messages[4], "38.39N 27.13W 08-27 12:00:\n8.2kts G:10.1 @ 337\n1.1m/11.0s @ 332\n1027.2mb")
+        self.assertEqual(
+            messages[5],
+            "38.39N 27.13W 08-27 18:00:\n11.5kts G:12.0 @ 342\n1.2m/11.7s @ 323\n1026.7mb",
         )

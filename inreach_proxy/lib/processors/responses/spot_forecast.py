@@ -75,9 +75,7 @@ class SpotForecast(BaseResponse):
         if lat and long:
             message_prefix = f"{lat} {long} "
 
-        current_message = ""
         messages = []
-
         seen_days = set()
         for line in interesting_lines[3:]:
             if line.strip() == "":
@@ -90,19 +88,10 @@ class SpotForecast(BaseResponse):
             if len(seen_days) > 2:
                 break
 
-            new_message = (
+            messages.append(
                 f'{message_prefix}{mapped["Date"]} {mapped["Time"]}:\n{mapped["WIND"]}kts G:{mapped["GUST"]} @ {mapped["DIR"]}\n'
                 f'{mapped["HTSGW"]}m/{mapped["PERPW"]}s @ {mapped["DIRPW"]}\n'
-                f'{mapped["PRESS"]}mb\n\n'
+                f'{mapped["PRESS"]}mb'
             )
-
-            if len(current_message) + len(new_message) > 160:
-                messages.append(current_message.strip())
-                current_message = ""
-
-            current_message += new_message
-
-        if current_message:
-            messages.append(current_message.strip())
 
         return messages
