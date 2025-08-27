@@ -6,6 +6,8 @@ from inreach_proxy.models import GarminConversations
 
 @dataclasses.dataclass
 class BaseAction:
+    _database_id: Optional[int] = None
+
     @staticmethod
     def matches(text: str) -> bool:
         raise NotImplementedError
@@ -15,8 +17,8 @@ class BaseAction:
         raise NotImplementedError
 
     @classmethod
-    def from_inputs(cls, inputs: Dict[str, Any]) -> Optional["BaseAction"]:
-        return cls(**inputs)
+    def from_inputs(cls, database_id: Optional[int], inputs: Dict[str, Any]) -> Optional["BaseAction"]:
+        return cls(**inputs | {"_database_id": database_id})
 
     def get_data(self) -> Dict[Any, Any]:
         return self.__dict__

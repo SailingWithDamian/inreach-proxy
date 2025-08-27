@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 class Command(BaseCommand):
     def _handle_request(self, request: Request):
         try:
-            action = VALID_ACTIONS[request.action].from_inputs(request.input)
+            action = VALID_ACTIONS[request.action].from_inputs(request.id, request.input)
         except TypeError as e:
             logger.error(f"Failed to construct action from request {request}: {e}")
             request.status = 3

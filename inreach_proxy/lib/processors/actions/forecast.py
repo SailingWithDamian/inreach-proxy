@@ -67,6 +67,10 @@ class SpotForecastAction(BaseAction):
                     self.latitude = latitude
                     self.longitude = longitude
 
+                    if self._database_id:
+                        # Update the request, so we can find it when the response comes in
+                        Request.objects.get(id=self._database_id).update(inputs=self.get_data())
+
         if not self.latitude or not self.longitude:
             logger.error(f"Failed to get latitude/longitude for forecast: {conversation.inbox.settings}")
             return
