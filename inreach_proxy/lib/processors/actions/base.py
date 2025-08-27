@@ -6,8 +6,6 @@ from inreach_proxy.models import GarminConversations
 
 @dataclasses.dataclass
 class BaseAction:
-    _database_id: Optional[int] = None
-
     @staticmethod
     def matches(text: str) -> bool:
         raise NotImplementedError
@@ -18,10 +16,15 @@ class BaseAction:
 
     @classmethod
     def from_inputs(cls, database_id: Optional[int], inputs: Dict[str, Any]) -> Optional["BaseAction"]:
-        return cls(**inputs | {"_database_id": database_id})
+        if hasattr(cls, "_database_id"):
+            inputs |= {"_database_id": database_id}
+        return cls(**inputs)
 
     def get_data(self) -> Dict[Any, Any]:
-        return self.__dict__
+        data = self.__dict__
+        if "_database_id" in data:
+            del data["_database_id"]
+        return data
 
     def get_type(self) -> int:
         return 0

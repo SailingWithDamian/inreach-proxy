@@ -18,17 +18,12 @@ class SpotForecastRequestTestCase(TestCase):
         self.assertFalse(SpotForecastAction.matches("ping"))
 
     def testDefault(self):
-        with requests_mock.Mocker() as m:
-            m.get("https://share.garmin.com/Feed/Share/test", text=PLACE_HOLDER_KML)
-            action = SpotForecastAction.from_text("forecast", {"map_share_key": "test"})
+        action = SpotForecastAction.from_text("forecast")
 
         self.assertIsNotNone(action)
         self.assertEqual(
             action.get_data(),
-            {
-                "latitude": "38.23N",
-                "longitude": "027.8W",
-            },
+            {"latitude": None, "longitude": None},
         )
 
     def testFromText(self):

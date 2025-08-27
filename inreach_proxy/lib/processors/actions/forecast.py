@@ -1,7 +1,7 @@
 import dataclasses
 import logging
 from email.message import EmailMessage
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, Tuple
 
 from inreach_proxy.lib.email import Outbound
 from inreach_proxy.lib.helpers import get_message_plain_text_body
@@ -14,8 +14,28 @@ logger = logging.getLogger(__name__)
 
 @dataclasses.dataclass
 class SpotForecastAction(BaseAction):
-    latitude: Optional[str]
-    longitude: Optional[str]
+    _database_id: Optional[int] = None
+    latitude: Optional[str] = None
+    longitude: Optional[str] = None
+
+    @staticmethod
+    def resolve_position(settings: Optional[Dict[Any, Any]] = None) -> Tuple[Optional[str], Optional[str]]:
+        if settings:
+            if map_share_key := settings.get("map_share_key"):
+                latitude, longitude = Garmin().get_latest_position(map_share_key)
+                if latitude and longitude:
+                    return SpotForecastAction.normalise_position(
+                        latitude, False
+                    ), SpotForecastAction.normalise_position(longitude, True)
+        return None, None
+
+    @staticmethod
+    def normalise_position(text: str, is_longitude: bool) -> Tuple[Optional[str], Optional[str]]:
+        pad_len = 3 if is_longitude else 2
+        if "." in text:
+            parts = text.split(".")
+            return f'{parts[0].rjust(pad_len, "0")}.{parts[1]}'
+        return text.rjust(pad_len, "0")
 
     @staticmethod
     def matches(text: str) -> bool:
@@ -28,48 +48,41 @@ class SpotForecastAction(BaseAction):
     def from_email(message: EmailMessage, settings: Optional[Dict[Any, Any]] = None) -> "SpotForecastAction":
         for line in get_message_plain_text_body(message).splitlines():
             if line == "forecast" or line.startswith("forecast "):
-                return SpotForecastAction.from_text(line, settings)
+                return SpotForecastAction.from_text(line, settings, True)
 
     @staticmethod
-    def from_text(text: str, settings: Optional[Dict[Any, Any]] = None) -> "SpotForecastAction":
+    def from_text(
+        text: str, settings: Optional[Dict[Any, Any]] = None, resolve_position: bool = False
+    ) -> "SpotForecastAction":
         arguments = text.split(" ")[1].strip().split(",") if " " in text else []
         # Note: Don't resolve the position using the map share here, otherwise the scheduled request will always
         # be for the same place, rather than the current place.
         if len(arguments) < 2:
-            return SpotForecastAction(latitude=None, longitude=None)
-
-        # Normalise
-        if "." in arguments[0]:
-            parts = arguments[0].split(".")
-            arguments[0] = f'{parts[0].rjust(2, "0")}.{parts[1]}'
-        else:
-            arguments[0] = arguments[0].rjust(2, "0")
-
-        if "." in arguments[1]:
-            parts = arguments[1].split(".")
-            arguments[1] = f'{parts[0].rjust(3, "0")}.{parts[1]}'
-        else:
-            arguments[1] = arguments[1].rjust(3, "0")
+            if resolve_position:
+                # Resolve the current position (i.e. when this comes from an email and not a scheduled request)
+                lat, long = SpotForecastAction.resolve_position(settings)
+                return SpotForecastAction(latitude=lat, longitude=long)
+            # Do not resolve the current position (i.e. when this comes from a scheduled request)
+            return SpotForecastAction()
 
         return SpotForecastAction(
-            latitude=arguments[0],
-            longitude=arguments[1],
+            latitude=SpotForecastAction.normalise_position(arguments[0], False),
+            longitude=SpotForecastAction.normalise_position(arguments[1], True),
         )
 
     def get_type(self) -> int:
         return 0
 
     def execute_with_email(self, conversation: GarminConversations):
-        if not self.latitude or not self.longitude:
-            if conversation.inbox.settings:
-                if map_share_key := conversation.inbox.settings.get("map_share_key"):
-                    latitude, longitude = Garmin().get_latest_position(map_share_key)
-                    self.latitude = latitude
-                    self.longitude = longitude
+        if self._database_id and (not self.latitude or not self.longitude):
+            # Resolve the current position (i.e. when this comes from a scheduled request)
+            lat, long = SpotForecastAction.resolve_position(settings)
+            if lat and long:
+                self.latitude = lat
+                self.longitude = long
 
-                    if self._database_id:
-                        # Update the request, so we can find it when the response comes in
-                        Request.objects.get(id=self._database_id).update(inputs=self.get_data())
+                # Update the request, so we can find it when the response comes in
+                Request.objects.get(id=self._database_id).update(inputs=self.get_data())
 
         if not self.latitude or not self.longitude:
             logger.error(f"Failed to get latitude/longitude for forecast: {conversation.inbox.settings}")
