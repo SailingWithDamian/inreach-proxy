@@ -1,5 +1,5 @@
 import logging
-from typing import Optional
+from typing import Optional, List
 
 from inreach_proxy.lib.models import ParsedEmail
 from inreach_proxy.lib.processors.actions import VALID_ACTIONS
@@ -55,23 +55,29 @@ def process_response(conversion: GarminConversations, response: BaseResponse):
 
     for request in requests:
         for message in response.get_messages():
-            create_response(request.conversation, request, message)
+            create_response(request.conversation, request, message, response.get_message_type())
 
 
-def create_response(conversation: GarminConversations, request: Optional[Request], text: str):
-    if len(text) < 160:
+def chunk_message(text: str, message_type: str) -> List[str]:
+    if len(text) <= 160:
+        return [text]
+
+    chunk_size = 160 - len(f"msg:{message_type}:01:99:")
+
+    messages = []
+    chunks = [text[i : i + chunk_size] for i in range(0, len(text), chunk_size)]
+    for x, chunk in enumerate(chunks):
+        messages.append(f"msg:{message_type}:{x+1:02d}:{len(chunks):02d}:{chunk}")
+    return messages
+
+
+def create_response(
+    conversation: GarminConversations, request: Optional[Request], text: str, message_type: str = "text"
+):
+    for message in chunk_message(text, message_type):
         Response.objects.create(
             conversation=conversation,
             request=request,
             status=0,
-            message=text,
+            message=message,
         )
-    else:
-        chunks = [text[i : i + 140] for i in range(0, len(text), 140)]
-        for x, chunk in enumerate(chunks):
-            Response.objects.create(
-                conversation=conversation,
-                request=request,
-                status=0,
-                message=f"msg: {x}/{len(chunks)}\n{chunk}\nZZZZZZZZZZ\n",
-            )

@@ -49,7 +49,7 @@ class Command(BaseCommand):
                     try:
                         self._handle_request(request)
                     except Exception as e:
-                        logger.error(f"Failed to process {request}: {e}")
+                        logger.exception(f"Failed to process {request}: {e}")
 
                     processed_requests += 1
                     if processed_requests > 1:

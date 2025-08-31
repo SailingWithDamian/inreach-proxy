@@ -1,4 +1,6 @@
+import base64
 import dataclasses
+import zlib
 from datetime import datetime
 from typing import List
 
@@ -13,15 +15,15 @@ from inreach_proxy.models import Request, GarminConversations
 class Grib(BaseResponse):
     received_time: datetime
     request_code: str
-    compressed_grib: bytes
+    grib: bytes
 
     @staticmethod
     def matches(text: str) -> bool:
         for line in text.splitlines():
             if any(
                 {
-                    line.startswith(f"{model}:")
-                    for model in {"GFS", "GFS-wave", "HRRR", "ECMWF", "ICON", "NAVGEM", "COAMPS", "RTOFS"}
+                    line.upper().startswith(f"{model}:")
+                    for model in {"GFS", "GFS-WAVE", "HRRR", "ECMWF", "ICON", "NAVGEM", "COAMPS", "RTOFS"}
                 }
             ):
                 return True
@@ -66,5 +68,8 @@ class Grib(BaseResponse):
     def __str__(self) -> str:
         return f"Grib(received_time={self.received_time}, request_code={self.request_code})"
 
+    def get_message_type(self) -> 'str':
+        return 'grib'
+
     def get_messages(self) -> List[str]:
-        return ["hello world"]
+        return [base64.b64encode(zlib.compress(self.grib)).decode()]

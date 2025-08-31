@@ -33,7 +33,7 @@ class Command(BaseCommand):
                     try:
                         self._handle_response(response)
                     except Exception as e:
-                        logger.error(f"Failed to process {response}: {e}")
+                        logger.exception(f"Failed to process {response}: {e}")
 
                     processed_responses += 1
                     if processed_responses > 1:

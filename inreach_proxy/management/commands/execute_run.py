@@ -12,7 +12,7 @@ class Command(BaseCommand):
         try:
             call_command(command)
         except Exception as e:
-            logger.warning(f"Executing {command} failed: {e}")
+            logger.exception(f"Executing {command} failed: {e}")
 
     def handle(self, *args: Any, **options: Any) -> None:
         """Execute a full run."""

@@ -37,7 +37,7 @@ class SailDocsMessageParser:
                 Grib(
                     request_code=request_code,
                     received_time=parsedate_to_datetime(message["date"]),
-                    compressed_grib=base64.b64encode(zlib.compress(attachment)),
+                    grib=attachment,
                 )
             )
 
