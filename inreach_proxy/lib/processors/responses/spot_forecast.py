@@ -80,6 +80,9 @@ class SpotForecast(BaseResponse):
                 continue
 
             fields = [field for field in line.split(" ") if len(field.strip()) > 0]
+            if len(fields) < len(header_fields):
+                logger.warning(f'Found missing fields: {fields} ({header_fields})')
+                continue
             mapped = {header_fields[x]: fields[x] for x, _ in enumerate(header_fields)}
 
             messages.append(
