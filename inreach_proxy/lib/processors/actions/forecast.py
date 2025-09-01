@@ -4,7 +4,7 @@ from email.message import EmailMessage
 from typing import Dict, Any, Optional, Tuple
 
 from inreach_proxy.lib.email import Outbound
-from inreach_proxy.lib.helpers import get_message_plain_text_body
+from inreach_proxy.lib.helpers import get_message_plain_text_body, decimal_degress_to_dd_mm_ss, normalise_dd_mm_ss
 from inreach_proxy.lib.integrations.garmin import Garmin
 from inreach_proxy.lib.processors.actions.base import BaseAction
 from inreach_proxy.models import GarminConversations, Request
@@ -24,18 +24,11 @@ class SpotForecastAction(BaseAction):
             if map_share_key := settings.get("map_share_key"):
                 latitude, longitude = Garmin().get_latest_position(map_share_key)
                 if latitude and longitude:
-                    return SpotForecastAction.normalise_position(
-                        latitude, False
-                    ), SpotForecastAction.normalise_position(longitude, True)
+                    return (
+                        decimal_degress_to_dd_mm_ss(latitude, True),
+                        decimal_degress_to_dd_mm_ss(longitude, False),
+                    )
         return None, None
-
-    @staticmethod
-    def normalise_position(text: str, is_longitude: bool) -> Tuple[Optional[str], Optional[str]]:
-        pad_len = 3 if is_longitude else 2
-        if "." in text:
-            parts = text.split(".")
-            return f'{parts[0].rjust(pad_len, "0")}.{parts[1]}'
-        return text.rjust(pad_len, "0")
 
     @staticmethod
     def matches(text: str) -> bool:
@@ -66,8 +59,8 @@ class SpotForecastAction(BaseAction):
             return SpotForecastAction()
 
         return SpotForecastAction(
-            latitude=SpotForecastAction.normalise_position(arguments[0], False),
-            longitude=SpotForecastAction.normalise_position(arguments[1], True),
+            latitude=normalise_dd_mm_ss(arguments[0], False),
+            longitude=normalise_dd_mm_ss(arguments[1], True),
         )
 
     def get_type(self) -> int:

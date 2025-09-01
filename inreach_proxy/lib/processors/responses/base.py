@@ -16,8 +16,8 @@ class BaseResponse:
     def find_request_for_response(self, conversion: GarminConversations) -> List[Request]:
         raise NotImplementedError
 
-    def get_message_type(self) -> 'str':
-        return 'txt'
+    def get_message_type(self) -> "str":
+        return "txt"
 
     def get_messages(self) -> List[str]:
         raise NotImplementedError

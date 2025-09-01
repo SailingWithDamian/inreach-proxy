@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 
 class Garmin:
-    def get_latest_position(self, share_key: str) -> Tuple[Optional[str], Optional[str]]:
+    def get_latest_position(self, share_key: str) -> Tuple[Optional[float], Optional[float]]:
         r = requests.get(f"https://share.garmin.com/Feed/Share/{share_key}", timeout=10)
         r.raise_for_status()
         root = ET.fromstring(r.text)
@@ -21,9 +21,6 @@ class Garmin:
         if coordinates is not None:
             if "," in coordinates.text:
                 parts = coordinates.text.split(",")
-
-                latitude = decimal_degress_to_dd_mm_ss(parts[0], True)
-                longitude = decimal_degress_to_dd_mm_ss(parts[1], False)
-                return longitude, latitude
+                return float(parts[1]), float(parts[0])
 
         return None, None

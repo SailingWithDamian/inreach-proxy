@@ -68,8 +68,8 @@ class Grib(BaseResponse):
     def __str__(self) -> str:
         return f"Grib(received_time={self.received_time}, request_code={self.request_code})"
 
-    def get_message_type(self) -> 'str':
-        return 'grib'
+    def get_message_type(self) -> "str":
+        return "grib"
 
     def get_messages(self) -> List[str]:
         return [base64.b64encode(zlib.compress(self.grib)).decode()]

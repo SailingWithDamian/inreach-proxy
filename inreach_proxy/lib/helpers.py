@@ -1,5 +1,6 @@
+import math
 from email.message import EmailMessage
-from typing import Optional, Tuple, Union
+from typing import Optional, Union
 
 
 def get_message_plain_text_body(message: EmailMessage) -> Optional[str]:
@@ -36,24 +37,55 @@ def dd_mm_ss_to_decimal_degrees(coord: str):
 
 def decimal_degress_to_dd_mm_ss(decimal_string: Union[str, float], is_latitude: bool):
     orientation = (
-        ("W" if str(decimal_string)[0] == "-" else "E")
+        ("S" if str(decimal_string)[0] == "-" else "N")
         if is_latitude
-        else ("S" if str(decimal_string)[0] == "-" else "N")
+        else ("W" if str(decimal_string)[0] == "-" else "E")
     )
     decimal_degress = float(str(decimal_string).lstrip("-"))
 
     degrees = int(decimal_degress)
     decimal_minutes = abs(decimal_degress - degrees) * 60
     minutes = int(decimal_minutes)
-    return f"{degrees}.{minutes}{orientation}"
+
+    return normalise_dd_mm_ss(f"{degrees}.{minutes}{orientation}", is_latitude)
 
 
-def calculate_bounding_box(latitude: str, longitude: str) -> Tuple[str, str, str, str]:
-    latitude = dd_mm_ss_to_decimal_degrees(latitude)
-    longitude = dd_mm_ss_to_decimal_degrees(longitude)
+def normalise_dd_mm_ss(text: str, is_longitude: bool) -> str:
+    pad_len = 3 if is_longitude else 2
+    if "." in text:
+        parts = text.split(".")
+        return f'{parts[0].rjust(pad_len, "0")}.{parts[1]}'
+    return text.rjust(pad_len, "0")
+
+
+def calculate_bounding_box(latitude: float, longitude: float, bearing: Optional[float] = None):
+    half_box = 120 / 2.0
+    delta_latitude = 1.0 / 60.0
+    delta_longitude = 1.0 / (60.0 * math.cos(math.radians(latitude)))
+
+    if bearing is not None:
+        heading = math.radians(bearing)
+        delta_x_nm = half_box * math.sin(heading)
+        delta_y_nm = half_box * math.cos(heading)
+
+        forward_x_deg = delta_x_nm * (2 * 0.9) * delta_longitude
+        forward_y_deg = delta_y_nm * (2 * 0.9) * delta_latitude
+        backward_x_deg = -delta_x_nm * (2 * 0.1) * delta_longitude
+        backward_y_deg = -delta_y_nm * (2 * 0.1) * delta_latitude
+
+        latitude_min = latitude + min(backward_y_deg, forward_y_deg)
+        latitude_max = latitude + max(backward_y_deg, forward_y_deg)
+        longitude_min = longitude + min(backward_x_deg, forward_x_deg)
+        longitude_max = longitude + max(backward_x_deg, forward_x_deg)
+    else:
+        latitude_min = latitude - delta_latitude
+        latitude_max = latitude + delta_latitude
+        longitude_min = longitude - delta_longitude
+        longitude_max = longitude + delta_longitude
+
     return (
-        decimal_degress_to_dd_mm_ss(latitude - 1, False),
-        decimal_degress_to_dd_mm_ss(latitude + 1, False),
-        decimal_degress_to_dd_mm_ss(longitude - 1, True),
-        decimal_degress_to_dd_mm_ss(longitude + 1, True),
+        decimal_degress_to_dd_mm_ss(latitude_min, True),
+        decimal_degress_to_dd_mm_ss(latitude_max, True),
+        decimal_degress_to_dd_mm_ss(longitude_min, False),
+        decimal_degress_to_dd_mm_ss(longitude_max, False),
     )

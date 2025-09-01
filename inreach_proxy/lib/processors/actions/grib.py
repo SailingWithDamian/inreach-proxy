@@ -5,6 +5,7 @@ from typing import Dict, Any, List, Optional
 from inreach_proxy.lib.email import Outbound
 from inreach_proxy.lib.helpers import get_message_plain_text_body, calculate_bounding_box
 from inreach_proxy.lib.integrations.garmin import Garmin
+from inreach_proxy.lib.integrations.predict_wind import PredictWind
 from inreach_proxy.lib.processors.actions.base import BaseAction
 from inreach_proxy.models import GarminConversations
 
@@ -40,8 +41,13 @@ class GribFetchAction(BaseAction):
 
         area_parts = parts[1].split(",") if len(parts) >= 2 else "auto"
 
-        if len(parts) < 2 or parts[1].lower() == "auto":
+        if len(parts) < 2 or parts[1].lower() in {"auto", "auto:simple"}:
             if settings:
+                bearing = None
+                if len(parts) < 2 or parts[1].lower() == "auto":
+                    if predict_wind_key := settings.get("predict_wind_key"):
+                        bearing = PredictWind().get_average_bearing(predict_wind_key)
+
                 if map_share_key := settings.get("map_share_key"):
                     latitude, longitude = Garmin().get_latest_position(map_share_key)
                     if latitude and longitude:
@@ -50,7 +56,7 @@ class GribFetchAction(BaseAction):
                             max_latitude,
                             min_longitude,
                             max_longitude,
-                        ) = calculate_bounding_box(latitude, longitude)
+                        ) = calculate_bounding_box(latitude, longitude, bearing)
                         area_parts = [min_latitude, max_latitude, min_longitude, max_longitude]
 
         if len(area_parts) != 4:
