@@ -1,0 +1,84 @@
+Return-path: <query-reply@saildocs.com>
+Envelope-to: vista_mar+spot.forecast@inreach-proxy.sailingwithdamian.eu
+Received: from saildocs.com ([44.193.104.173]:65402)
+	by ws-01.infrabits.nl with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.93)
+	(envelope-from <query-reply@saildocs.com>)
+	id 1urJuq-006hd0-Kr
+	for vista_mar+spot.forecast@inreach-proxy.sailingwithdamian.eu; Wed, 27 Aug 2025 17:26:33 +0000
+dkim-signature: v=1; a=rsa-sha256; d=saildocs.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt; h=From:Subject:Date:Message-ID:To:MIME-Version:Content-Type:Content-Transfer-Encoding;
+	bh=hwrtdvg3TTX5ldOeM9sfQnear04LETfVQhasO8Vm9fk=;
+	b=CRK2+1i5XELDXSZZlVM6VTN81MxZCNpMen58yYW8c9JU5kn+rafti+WHHLaEDZv+eKMQkmYQjYue0ypS+b6QE5CFbOSGmtlvP5bobz6cSU6gb9OvqxJi0VNoiEt9g4axOi48dhtwNc8fV6cfOiHjYtT0QvgQdeERq+CfZxVLXio=
+Received: from saildocs.com (EC2AMAZ-BA8NS0H [127.0.0.1])
+	by saildocs.com with ESMTP
+	; Wed, 27 Aug 2025 17:26:31 +0000
+Received: from mail pickup service by saildocs.com with Microsoft SMTPSVC;
+	 Wed, 27 Aug 2025 17:26:31 +0000
+To: vista_mar+spot.forecast@inreach-proxy.sailingwithdamian.eu
+Subject: spot:38.39N,027.13W
+Message-ID: <45896727.2882206@saildocs.com>
+Date: 27 Aug 2025 17:26:31 -0000
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+From: query-reply@saildocs.com
+X-OriginalArrivalTime: 27 Aug 2025 17:26:31.0510 (UTC) FILETIME=[BAB2CF60:01DC1777]
+Received-SPF: pass client-ip=44.193.104.173; envelope-from=query-reply@saildocs.com; helo=saildocs.com
+X-DKIM: DKIM passed: (address=query-reply@saildocs.com domain=saildocs.com), signature is good.
+X-Spam-Score: -0.2
+X-Spam-Bar: /
+X-Spam-Status: innocent
+
+Data extracted from file gfs%-20250827-12z.grb dated 2025/08/27 17:14:34z
+request code: spot:38.39N,027.13W
+
+Forecast for 38=B023N 027=B008W (see notes below)
+Date   Time  WIND DIR GUST  PRESS HTSGW DIRPW PERPW
+        utc   kts deg  kts    hPa  mtrs   deg   sec
+----------- ----- --- ---- ------ ----- ----- -----
+08-27 12:00  10.4 338 12.4 1027.1   1.1   331  11.2
+08-27 18:00  10.9 358 11.6 1026.7   1.2   332  11.2
+
+08-28 00:00   8.0 343  8.6 1027.9   1.1   331  11.0
+08-28 06:00   6.7 354  7.3 1027.6   1.0   334  10.3
+08-28 12:00   4.4 004  6.2 1028.7   1.0   316  11.4
+08-28 18:00   3.2 343  4.7 1027.1   1.0   324  11.5
+
+08-29 00:00   1.8 040  3.1 1027.3   1.0   322  11.4
+08-29 06:00   0.1 142  1.5 1025.1   0.9   316  11.1
+08-29 12:00   7.4 254  8.0 1025.5   0.8   311  10.9
+08-29 18:00  12.8 255 13.5 1023.4   0.8   309  10.4
+
+08-30 00:00  10.1 274 12.5 1023.4   0.9   300  10.1
+08-30 06:00  14.2 264 15.5 1021.9   1.0   292  10.9
+08-30 12:00   5.1 330  6.4 1023.7   0.9   285  10.0
+08-30 18:00  12.4 021 12.8 1024.8   1.0   291   9.3
+
+08-31 00:00  10.4 015 10.1 1027.3   0.9   304   8.6
+08-31 06:00   7.7 002  8.1 1026.9   0.9   322   8.9
+08-31 12:00   5.8 024  6.6 1028.9   0.9   330   9.8
+08-31 18:00   5.6 007  6.3 1028.0   0.9   327   9.6
+
+09-01 00:00   3.3 348  4.4 1028.8   0.9   328   9.3
+09-01 06:00   6.4 275  7.2 1026.9   0.8   330   9.9
+
+Refer to notice & warnings sent 2025/08/27 16:47:26, for another copy send =
+a (blank) email to: SpotWarning@saildocs.com
+
+=3D=3D=3D=3D=3D
+Thanks for using Saildocs, an Internet document retrieval 
+service for the bandwidth-impaired.  By using this service
+you agree to the Saildocs terms and conditions (send a 
+blank email to: terms@saildocs.com for a copy). 
+
+Saildocs is a service of Sailmail, a membership-owned email 
+service built by cruising sailors for cruising sailors. 
+Sailmail provides world-wide email via marine-band radio, 
+internet and satellite including support for the Iridium GO!
+
+For more information on SailMail see the web page at www.sailmail.com 
+or send a query to the office at sysop@sailmail.com. 
+More information on Saildocs is available by sending an email to 
+info@saildocs.com, this will return the how-to document (about 5K). 
+

@@ -1,5 +1,10 @@
+from email import policy
+from email.parser import BytesParser
+
+from django.conf import settings
 from django.test import TestCase
 
+from inreach_proxy.lib.parsers import SailDocsMessageParser
 from inreach_proxy.lib.processors.responses.spot_forecast import SpotForecast
 
 
@@ -20,71 +25,23 @@ NOTICE:
         )
 
     def testForecastParsing(self):
-        sf = SpotForecast(
-            received_time=None,
-            request_code="spot:38.39N,27.13W",
-            text="""
-Data extracted from file gfs-20250826-06z.grb dated 2025/08/26 11:13:30z
-request code: spot:38.39N,27.13W
+        email_file = settings.BASE_DIR / "inreach_proxy" / "tests" / "data" / "forecast-2.eml"
+        with email_file.open("rb") as fh:
+            email_msg = BytesParser(policy=policy.default).parse(fh)
+            parsed_email = SailDocsMessageParser().process(email_msg)
 
-Forecast for 38°23N 027°08W (see notes below)
-Date   Time  WIND DIR GUST  PRESS HTSGW DIRPW PERPW
-        utc   kts deg  kts    hPa  mtrs   deg   sec
------------ ----- --- ---- ------ ----- ----- -----
-08-26 12:00   6.5 345  7.0 1027.1   1.4   316  12.2
-08-26 18:00   7.2 335  9.0 1026.2   1.4   321  11.9
-
-08-27 00:00   7.7 349  8.6 1027.0   1.3   319  11.7
-08-27 06:00   8.0 340 10.1 1025.8   1.1   327  11.3
-08-27 12:00   8.2 337 10.1 1027.2   1.1   332  11.0
-08-27 18:00  11.5 342 12.0 1026.7   1.2   323  11.7
-
-08-28 00:00   7.7 351  9.0 1027.8   1.1   333  11.1
-08-28 06:00   6.2 356  7.8 1027.1   1.0   336  10.8
-08-28 12:00   4.8 354  5.9 1028.5   1.0   320  11.4
-08-28 18:00   3.1 357  5.1 1026.7   1.1   325  11.5
-
-08-29 00:00   2.5 040  3.3 1027.1   1.0   324  11.4
-08-29 06:00   2.1 252  2.7 1025.1   0.9   321  11.1
-08-29 12:00   6.5 264  6.7 1026.0   0.8   319  10.9
-08-29 18:00  11.4 255 11.7 1023.7   0.8   316  10.5
-
-08-30 00:00   9.9 274 10.7 1024.4   0.8   308  10.3
-08-30 06:00   9.9 255 11.0 1022.8   0.8   303  10.1
-08-30 12:00  12.8 255 13.5 1024.9   0.8   308   9.8
-08-30 18:00   8.5 011 10.7 1025.2   0.7   309   9.2
-
-08-31 00:00  10.3 031 10.1 1027.4   0.8   176  13.5
-08-31 06:00   9.9 026  9.5 1027.0   0.8   284   9.7
-
-Refer to notice & warnings sent 2025/08/26 14:47:57, for another copy send a (blank) email to: SpotWarning@saildocs.com
-
-=====
-Thanks for using Saildocs, an Internet document retrieval 
-service for the bandwidth-impaired.  By using this service
-you agree to the Saildocs terms and conditions (send a 
-blank email to: terms@saildocs.com for a copy). 
-
-Saildocs is a service of Sailmail, a membership-owned email 
-service built by cruising sailors for cruising sailors. 
-Sailmail provides world-wide email via marine-band radio, 
-internet and satellite including support for the Iridium GO!
-
-For more information on SailMail see the web page at www.sailmail.com 
-or send a query to the office at sysop@sailmail.com. 
-More information on Saildocs is available by sending an email to 
-info@saildocs.com, this will return the how-to document (about 5K).""",
-        )
-        messages = sf.get_messages()
+        self.assertEqual(len(parsed_email.responses), 1)
+        self.assertTrue(isinstance(parsed_email.responses[0], SpotForecast))
+        messages = parsed_email.responses[0].get_messages()
 
         self.assertEqual(len(messages), 3)
         self.assertEqual(
             messages[0],
             (
                 "38.39N 027.13W\n"
-                "08-26 12:00\n"
-                "Wind: 6.5kts gust 7.0kts @ 345\n"
-                "Sea: 1.4m interval 12.2s @ 316\n"
+                "08-27 12:00\n"
+                "Wind: 10.4kts gust 12.4kts @ 338\n"
+                "Sea: 1.1m interval 11.2s @ 331\n"
                 "Pressure: 1027.1mb"
             ),
         )
@@ -92,19 +49,31 @@ info@saildocs.com, this will return the how-to document (about 5K).""",
             messages[1],
             (
                 "38.39N 027.13W\n"
-                "08-26 18:00\n"
-                "Wind: 7.2kts gust 9.0kts @ 335\n"
-                "Sea: 1.4m interval 11.9s @ 321\n"
-                "Pressure: 1026.2mb"
+                "08-27 18:00\n"
+                "Wind: 10.9kts gust 11.6kts @ 358\n"
+                "Sea: 1.2m interval 11.2s @ 332\n"
+                "Pressure: 1026.7mb"
             ),
         )
         self.assertEqual(
             messages[2],
             (
                 "38.39N 027.13W\n"
-                "08-27 00:00\n"
-                "Wind: 7.7kts gust 8.6kts @ 349\n"
-                "Sea: 1.3m interval 11.7s @ 319\n"
-                "Pressure: 1027.0mb"
+                "08-28 00:00\n"
+                "Wind: 8.0kts gust 8.6kts @ 343\n"
+                "Sea: 1.1m interval 11.0s @ 331\n"
+                "Pressure: 1027.9mb"
             ),
         )
+
+    def testPartialForecastParsing(self):
+        email_file = settings.BASE_DIR / "inreach_proxy" / "tests" / "data" / "forecast-1.eml"
+        with email_file.open("rb") as fh:
+            email_msg = BytesParser(policy=policy.default).parse(fh)
+            parsed_email = SailDocsMessageParser().process(email_msg)
+
+        self.assertEqual(len(parsed_email.responses), 1)
+        self.assertTrue(isinstance(parsed_email.responses[0], SpotForecast))
+
+        messages = parsed_email.responses[0].get_messages()
+        self.assertEqual(len(messages), 3)

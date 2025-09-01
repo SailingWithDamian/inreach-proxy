@@ -1,4 +1,3 @@
-from email.message import EmailMessage
 from typing import List
 
 from inreach_proxy.models import Request, GarminConversations
@@ -7,10 +6,6 @@ from inreach_proxy.models import Request, GarminConversations
 class BaseResponse:
     @staticmethod
     def matches(text: str) -> bool:
-        raise NotImplementedError
-
-    @staticmethod
-    def from_email(message: EmailMessage) -> "BaseResponse":
         raise NotImplementedError
 
     def find_request_for_response(self, conversation: GarminConversations) -> List[Request]:
