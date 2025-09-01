@@ -1,6 +1,4 @@
-import base64
 import logging
-import zlib
 from email.message import EmailMessage
 from email.utils import parsedate_to_datetime, parseaddr
 

@@ -1,10 +1,10 @@
 import logging
 from typing import Any
 
-from inreach_proxy.models import EmailInbox, GarminConversations
-from inreach_proxy.lib.garmin import GarminMapShare
 from django.core.management import BaseCommand
-from django.core.management import call_command
+
+from inreach_proxy.lib.garmin import GarminMapShare
+from inreach_proxy.models import EmailInbox, GarminConversations
 
 logger = logging.getLogger(__name__)
 

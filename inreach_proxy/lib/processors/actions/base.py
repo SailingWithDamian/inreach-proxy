@@ -16,12 +16,10 @@ class BaseAction:
 
     @classmethod
     def from_inputs(cls, database_id: Optional[int], inputs: Dict[str, Any]) -> Optional["BaseAction"]:
-        if hasattr(cls, "_database_id"):
-            inputs |= {"_database_id": database_id}
-        return cls(**inputs)
+        return cls(**(inputs | ({"_database_id": database_id} if hasattr(cls, "_database_id") else {})))
 
     def get_data(self) -> Dict[Any, Any]:
-        data = self.__dict__
+        data = dict(self.__dict__)
         if "_database_id" in data:
             del data["_database_id"]
         return data

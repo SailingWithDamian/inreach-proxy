@@ -33,6 +33,8 @@ class Command(BaseCommand):
             # Async execution
             logger.info(f"Executing async {action} for {request}")
             action.execute_with_email(request.conversation)
+            # Update the data in case the action changed it i.e. resolved a position
+            request.input = action.get_data()
             request.status = 1
             request.save()
 
@@ -46,6 +48,7 @@ class Command(BaseCommand):
                 for request in Request.objects.filter(Q(conversation=conversation) & Q(status=0)).prefetch_related(
                     "conversation"
                 ):
+
                     try:
                         self._handle_request(request)
                     except Exception as e:

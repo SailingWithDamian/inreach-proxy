@@ -33,8 +33,7 @@ class GarminMessageParser:
 
         garmin_reply_url = self._find_reply_url(text)
         if not garmin_reply_url:
-            logger.error(f"Failed to find reply url in the message: {text}")
-            return parsed_email
+            logger.warning(f"Failed to find reply url in the message: {text}")
 
         plain_text_body = get_message_plain_text_body(message)
 

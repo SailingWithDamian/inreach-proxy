@@ -3,7 +3,7 @@ from email.message import EmailMessage
 from typing import Dict, Any, List, Optional
 
 from inreach_proxy.lib.email import Outbound
-from inreach_proxy.lib.helpers import get_message_plain_text_body, calculate_bounding_box
+from inreach_proxy.lib.helpers import get_message_plain_text_body, calculate_bounding_box, normalise_dd_mm_ss
 from inreach_proxy.lib.integrations.garmin import Garmin
 from inreach_proxy.lib.integrations.predict_wind import PredictWind
 from inreach_proxy.lib.processors.actions.base import BaseAction
@@ -59,16 +59,16 @@ class GribFetchAction(BaseAction):
                         ) = calculate_bounding_box(latitude, longitude, bearing)
                         area_parts = [min_latitude, max_latitude, min_longitude, max_longitude]
 
-        if len(area_parts) != 4:
+        if not isinstance(area_parts, list) or len(area_parts) != 4:
             area_parts = ["36n", "52n", "026w", "005e"]
 
         # Normalise area:
         # N/S is 00 - 90
         # E/W is 000 - 180
-        area_parts[0] = area_parts[0].rjust(3, "0")
-        area_parts[1] = area_parts[1].rjust(3, "0")
-        area_parts[2] = area_parts[2].rjust(4, "0")
-        area_parts[3] = area_parts[3].rjust(4, "0")
+        area_parts[0] = normalise_dd_mm_ss(area_parts[0], True)
+        area_parts[1] = normalise_dd_mm_ss(area_parts[1], True)
+        area_parts[2] = normalise_dd_mm_ss(area_parts[2], False)
+        area_parts[3] = normalise_dd_mm_ss(area_parts[3], False)
 
         window = parts[2] if len(parts) >= 3 else None
         if len(parts) < 2 or parts[1].lower() == "auto":
@@ -80,7 +80,7 @@ class GribFetchAction(BaseAction):
 
         return GribFetchAction(
             model=model,
-            area=",".join(area_parts).lower(),
+            area=",".join(area_parts),
             grid=parts[3] if len(parts) >= 4 else "0.25,0.25",
             window=window or "24,48,72,96",
             parameters=sorted(parameters or ["WIND", "PRMSL", "WAVES"]),

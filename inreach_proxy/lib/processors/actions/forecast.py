@@ -7,7 +7,7 @@ from inreach_proxy.lib.email import Outbound
 from inreach_proxy.lib.helpers import get_message_plain_text_body, decimal_degress_to_dd_mm_ss, normalise_dd_mm_ss
 from inreach_proxy.lib.integrations.garmin import Garmin
 from inreach_proxy.lib.processors.actions.base import BaseAction
-from inreach_proxy.models import GarminConversations, Request
+from inreach_proxy.models import GarminConversations
 
 logger = logging.getLogger(__name__)
 
@@ -59,8 +59,8 @@ class SpotForecastAction(BaseAction):
             return SpotForecastAction()
 
         return SpotForecastAction(
-            latitude=normalise_dd_mm_ss(arguments[0], False),
-            longitude=normalise_dd_mm_ss(arguments[1], True),
+            latitude=normalise_dd_mm_ss(arguments[0], True),
+            longitude=normalise_dd_mm_ss(arguments[1], False),
         )
 
     def get_type(self) -> int:
@@ -73,9 +73,6 @@ class SpotForecastAction(BaseAction):
             if lat and long:
                 self.latitude = lat
                 self.longitude = long
-
-                # Update the request, so we can find it when the response comes in
-                Request.objects.filter(id=self._database_id).update(input=self.get_data())
 
         if not self.latitude or not self.longitude:
             logger.error(f"Failed to get latitude/longitude for forecast: {conversation.inbox.settings}")

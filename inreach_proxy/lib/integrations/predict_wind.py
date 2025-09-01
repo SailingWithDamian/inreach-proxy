@@ -1,12 +1,9 @@
 import logging
 from datetime import datetime, timedelta
-from typing import Optional, Tuple, List
-from defusedxml import ElementTree as ET
+from typing import Tuple, List
 
 import requests
 from numpy import average
-
-from inreach_proxy.lib.helpers import decimal_degress_to_dd_mm_ss
 
 logger = logging.getLogger(__name__)
 

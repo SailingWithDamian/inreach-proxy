@@ -6,6 +6,7 @@ from typing import List
 
 from django.db.models import Q
 
+from inreach_proxy.lib.helpers import normalise_dd_mm_ss
 from inreach_proxy.lib.processors.actions import GribFetchAction, ACTION_TO_DB_ID
 from inreach_proxy.lib.processors.responses.base import BaseResponse
 from inreach_proxy.models import Request, GarminConversations
@@ -29,7 +30,7 @@ class Grib(BaseResponse):
                 return True
         return False
 
-    def find_request_for_response(self, conversion: GarminConversations) -> List[Request]:
+    def find_request_for_response(self, conversation: GarminConversations) -> List[Request]:
         model = self.request_code.split(":")[0]
         parts = self.request_code.split(":")[1].split("|")
 
@@ -38,11 +39,11 @@ class Grib(BaseResponse):
         # E/W is 000 - 180
         area_parts = parts[0].split(",")
         if len(area_parts) == 4:
-            area_parts[0].rjust(3, "0")
-            area_parts[1].rjust(3, "0")
-            area_parts[2].rjust(4, "0")
-            area_parts[3].rjust(4, "0")
-            parts[0] = ",".join(area_parts).lower()
+            area_parts[0] = normalise_dd_mm_ss(area_parts[0], True)
+            area_parts[1] = normalise_dd_mm_ss(area_parts[1], True)
+            area_parts[2] = normalise_dd_mm_ss(area_parts[2], False)
+            area_parts[3] = normalise_dd_mm_ss(area_parts[3], False)
+            parts[0] = ",".join(area_parts)
 
         request = {
             "model": model,
@@ -54,7 +55,7 @@ class Grib(BaseResponse):
 
         requests = Request.objects.filter(
             Q(status=1)
-            & Q(conversation=conversion)
+            & Q(conversation=conversation)
             & Q(action=ACTION_TO_DB_ID[GribFetchAction])
             & Q(created__lte=self.received_time)
             & Q(input__model=request["model"])

@@ -1,8 +1,8 @@
 import logging
 from email.message import EmailMessage
+from email.utils import parseaddr
 from typing import Optional, Dict, Any
 
-from email.utils import parseaddr
 from inreach_proxy.lib.models import ParsedEmail
 from inreach_proxy.lib.parsers.garmin import GarminMessageParser
 from inreach_proxy.lib.parsers.sail_docs import SailDocsMessageParser

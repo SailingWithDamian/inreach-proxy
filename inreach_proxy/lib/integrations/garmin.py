@@ -1,10 +1,8 @@
 import logging
 from typing import Optional, Tuple
-from defusedxml import ElementTree as ET
 
 import requests
-
-from inreach_proxy.lib.helpers import decimal_degress_to_dd_mm_ss
+from defusedxml import ElementTree as ET
 
 logger = logging.getLogger(__name__)
 

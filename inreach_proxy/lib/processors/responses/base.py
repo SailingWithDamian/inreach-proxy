@@ -13,7 +13,7 @@ class BaseResponse:
     def from_email(message: EmailMessage) -> "BaseResponse":
         raise NotImplementedError
 
-    def find_request_for_response(self, conversion: GarminConversations) -> List[Request]:
+    def find_request_for_response(self, conversation: GarminConversations) -> List[Request]:
         raise NotImplementedError
 
     def get_message_type(self) -> "str":

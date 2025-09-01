@@ -21,11 +21,11 @@ class GribFetchRequestTestCase(TestCase):
         self.assertEqual(
             action.get_data(),
             {
-                "area": "36n,52n,026w,005e",
+                "area": "36N,52N,026W,005E",
                 "grid": "0.25,0.25",
                 "model": "GFS",
-                "parameters": ["PRMSL", "WAVES", "WIND"],
-                "window": "24,48,72,96",
+                "parameters": ["WIND"],
+                "window": "24",
             },
         )
 
@@ -35,11 +35,11 @@ class GribFetchRequestTestCase(TestCase):
         self.assertEqual(
             action.get_data(),
             {
-                "area": "36n,52n,026w,005e",
+                "area": "36N,52N,026W,005E",
                 "grid": "0.25,0.25",
                 "model": "ECMWF",
-                "parameters": ["PRMSL", "WAVES", "WIND"],
-                "window": "24,48,72,96",
+                "parameters": ["WIND"],
+                "window": "24",
             },
         )
 
@@ -52,7 +52,7 @@ class GribFetchRequestTestCase(TestCase):
         self.assertEqual(
             action.get_data(),
             {
-                "area": "38n,40n,025w,020w",
+                "area": "38N,40N,025W,020W",
                 "grid": "0.25,0.25",
                 "model": "GFS",
                 "parameters": ["PRMSL", "WAVES", "WIND"],

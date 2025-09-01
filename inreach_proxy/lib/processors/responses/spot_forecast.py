@@ -5,6 +5,7 @@ from typing import Optional, List, Tuple
 
 from django.db.models import Q
 
+from inreach_proxy.lib.helpers import normalise_dd_mm_ss
 from inreach_proxy.lib.processors.actions import ACTION_TO_DB_ID, SpotForecastAction
 from inreach_proxy.lib.processors.responses.base import BaseResponse
 from inreach_proxy.models import Request, GarminConversations
@@ -31,19 +32,17 @@ class SpotForecast(BaseResponse):
             logger.error(f"Could not parse lat/long: {parts}")
             return None, None
 
-        # Normalise to same as request
-        return parts[0].rjust(3, "0").upper(), parts[1].rjust(4, "0").upper()
+        return normalise_dd_mm_ss(parts[0], True), normalise_dd_mm_ss(parts[1], False)
 
-    def find_request_for_response(self, conversion: GarminConversations) -> List[Request]:
+    def find_request_for_response(self, conversation: GarminConversations) -> List[Request]:
         lat, long = self._get_lat_long_from_request()
         if not lat or not long:
             return []
 
         request = {"lat": lat, "long": long}
-
         requests = Request.objects.filter(
             Q(status=1)
-            & Q(conversation=conversion)
+            & Q(conversation=conversation)
             & Q(action=ACTION_TO_DB_ID[SpotForecastAction])
             & Q(created__lte=self.received_time)
             & Q(input__latitude=request["lat"])

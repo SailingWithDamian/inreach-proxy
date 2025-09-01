@@ -41,21 +41,26 @@ def decimal_degress_to_dd_mm_ss(decimal_string: Union[str, float], is_latitude: 
         if is_latitude
         else ("W" if str(decimal_string)[0] == "-" else "E")
     )
-    decimal_degress = float(str(decimal_string).lstrip("-"))
+    decimal_degrees = float(str(decimal_string).lstrip("-"))
 
-    degrees = int(decimal_degress)
-    decimal_minutes = abs(decimal_degress - degrees) * 60
+    degrees = int(decimal_degrees)
+    decimal_minutes = abs(decimal_degrees - degrees) * 60
     minutes = int(decimal_minutes)
 
     return normalise_dd_mm_ss(f"{degrees}.{minutes}{orientation}", is_latitude)
 
 
-def normalise_dd_mm_ss(text: str, is_longitude: bool) -> str:
-    pad_len = 3 if is_longitude else 2
+def normalise_dd_mm_ss(text: str, is_latitude: bool) -> str:
+    orientation = ""
+    if text[-1].upper() in {"N", "S", "E", "W"}:
+        orientation = text[-1].upper()
+        text = text[0:-1]
+
+    expected_len = 2 if is_latitude else 3
     if "." in text:
         parts = text.split(".")
-        return f'{parts[0].rjust(pad_len, "0")}.{parts[1]}'
-    return text.rjust(pad_len, "0")
+        return f'{parts[0].rjust(expected_len, "0")[-expected_len:]}.{parts[1]}{orientation}'
+    return f'{text.rjust(expected_len, "0")[-expected_len:]}{orientation}'
 
 
 def calculate_bounding_box(latitude: float, longitude: float, bearing: Optional[float] = None):

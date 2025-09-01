@@ -47,8 +47,8 @@ def execute_action(conversation: GarminConversations, action: BaseAction):
     create_response(conversation, None, action.execute())
 
 
-def process_response(conversion: GarminConversations, response: BaseResponse):
-    requests = response.find_request_for_response(conversion)
+def process_response(conversation: GarminConversations, response: BaseResponse):
+    requests = response.find_request_for_response(conversation)
     if not requests:
         logger.error(f"Failed to find request for {response}")
         return
@@ -59,7 +59,7 @@ def process_response(conversion: GarminConversations, response: BaseResponse):
 
 
 def chunk_message(text: str, message_type: str) -> List[str]:
-    if len(text) <= 160:
+    if len(text) <= 160 and message_type == "txt":
         return [text]
 
     chunk_size = 160 - len(f"msg:{message_type}:01:99:")
@@ -67,7 +67,7 @@ def chunk_message(text: str, message_type: str) -> List[str]:
     messages = []
     chunks = [text[i : i + chunk_size] for i in range(0, len(text), chunk_size)]
     for x, chunk in enumerate(chunks):
-        messages.append(f"msg:{message_type}:{x+1:02d}:{len(chunks):02d}:{chunk}")
+        messages.append(f"msg:{message_type}:{x + 1:02d}:{len(chunks):02d}:{chunk}")
     return messages
 
 

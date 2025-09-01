@@ -81,7 +81,7 @@ info@saildocs.com, this will return the how-to document (about 5K).""",
         self.assertEqual(
             messages[0],
             (
-                "38.39N 27.13W\n"
+                "38.39N 027.13W\n"
                 "08-26 12:00\n"
                 "Wind: 6.5kts gust 7.0kts @ 345\n"
                 "Sea: 1.4m interval 12.2s @ 316\n"
@@ -91,7 +91,7 @@ info@saildocs.com, this will return the how-to document (about 5K).""",
         self.assertEqual(
             messages[1],
             (
-                "38.39N 27.13W\n"
+                "38.39N 027.13W\n"
                 "08-26 18:00\n"
                 "Wind: 7.2kts gust 9.0kts @ 335\n"
                 "Sea: 1.4m interval 11.9s @ 321\n"
@@ -101,7 +101,7 @@ info@saildocs.com, this will return the how-to document (about 5K).""",
         self.assertEqual(
             messages[2],
             (
-                "38.39N 27.13W\n"
+                "38.39N 027.13W\n"
                 "08-27 00:00\n"
                 "Wind: 7.7kts gust 8.6kts @ 349\n"
                 "Sea: 1.3m interval 11.7s @ 319\n"
