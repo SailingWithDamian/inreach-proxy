@@ -54,6 +54,9 @@ def process_response(conversation: GarminConversations, response: BaseResponse):
         return
 
     for request in requests:
+        request.status = 2
+        request.save()
+
         for message in response.get_messages():
             create_response(request.conversation, request, message, response.get_message_type())
 
