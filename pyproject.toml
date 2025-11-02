@@ -22,7 +22,7 @@ tox-current-env = "0.0.14"
 black = "25.1.0"
 ruff = "0.9.7"
 djlint = "1.36.4"
-bandit = "1.8.3"
+bandit = "1.8.6"
 requests_mock = "1.12.1"
 
 [tool.ruff]
