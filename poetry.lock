@@ -17,14 +17,14 @@ tests = ["mypy (>=1.14.0)", "pytest", "pytest-asyncio"]
 
 [[package]]
 name = "bandit"
-version = "1.9.1"
+version = "1.9.2"
 description = "Security oriented static analyser for python code."
 optional = false
 python-versions = ">=3.10"
 groups = ["test"]
 files = [
-    {file = "bandit-1.9.1-py3-none-any.whl", hash = "sha256:0a1f34c04f067ee28985b7854edaa659c9299bd71e1b7e18236e46cccc79720b"},
-    {file = "bandit-1.9.1.tar.gz", hash = "sha256:6dbafd1a51e276e065404f06980d624bad142344daeac3b085121fcfd117b7cf"},
+    {file = "bandit-1.9.2-py3-none-any.whl", hash = "sha256:bda8d68610fc33a6e10b7a8f1d61d92c8f6c004051d5e946406be1fb1b16a868"},
+    {file = "bandit-1.9.2.tar.gz", hash = "sha256:32410415cd93bf9c8b91972159d5cf1e7f063a9146d70345641cd3877de348ce"},
 ]
 
 [package.dependencies]
@@ -1164,4 +1164,4 @@ test = ["covdefaults (>=2.3)", "coverage (>=7.2.7)", "coverage-enable-subprocess
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.13"
-content-hash = "9717b7763c668da0d05e3fd4dca0f93497f2f49d19fdd3d78745820d51da0a38"
+content-hash = "d68fa60870a6a84f30596f538d5459ca5aec15e56925334fb8a04aabb1480d46"
