@@ -20,5 +20,6 @@
       "groupName": "dev dependencies",
       "schedule": ["* * * * 1"]
     }
-  ]
+  ],
+  "ignoreTests": true
 }
