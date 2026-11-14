@@ -17,11 +17,11 @@ dependencies = [
 ]
 
 [tool.poetry.group.test.dependencies]
-tox = "4.52.0"
-tox-current-env = "0.0.16"
+tox = "4.67.13"
+tox-current-env = "0.0.17"
 black = "25.12.0"
-ruff = "0.15.9"
-djlint = "1.36.4"
+ruff = "0.17.5"
+djlint = "1.50.1"
 bandit = "1.9.4"
 requests_mock = "1.12.1"
 
